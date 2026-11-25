@@ -38,40 +38,53 @@ if "show_all_notices" not in st.session_state:
     st.session_state["show_all_notices"] = False
 if "gov_officer" not in st.session_state:
     st.session_state["gov_officer"] = None
-if "chat_history" not in st.session_state:
-    st.session_state["chat_history"] = []
+if "search_query" not in st.session_state:
+    st.session_state["search_query"] = ""
 
-# -------------------- FULL-WIDTH INDIA.GOV.IN & WHATSAPP CHAT CSS --------------------
+# -------------------- FULL-WIDTH RESPONSIVE + ANTI-DARK-MODE CSS --------------------
 st.markdown("""
 <style>
-    /* Force 100% Full-Width Edge-to-Edge across Mobile, Tablet, Laptop & Desktop */
-    header[data-testid="stHeader"] {
-        display: none !important;
+    /* Force crisp Light Theme across all mobile/desktop browsers */
+    header[data-testid="stHeader"] { display: none !important; }
+    .stApp, [data-testid="stAppViewContainer"] {
+        background-color: #F4F6F9 !important;
+        color: #0F172A !important;
     }
-    .stApp {
-        background-color: #F4F6F9;
+    .stApp p, .stApp label, .stApp span, .stApp div, .stMarkdown, .stCaption {
+        color: #0F172A;
+    }
+    /* Fix Streamlit inputs on mobile dark browsers */
+    input, textarea, select, [data-baseweb="select"] > div, [data-baseweb="input"] > div {
+        background-color: #FFFFFF !important;
+        color: #0F172A !important;
+        border-color: #CBD5E1 !important;
+    }
+    [data-testid="stFileUploader"] section {
+        background-color: #FFFFFF !important;
+        border: 1.5px dashed #94A3B8 !important;
+        color: #0F172A !important;
     }
     .block-container {
         max-width: 100% !important;
         width: 100% !important;
         padding-top: 0rem !important;
-        padding-left: 1.5rem !important;
-        padding-right: 1.5rem !important;
-        padding-bottom: 2rem !important;
+        padding-left: 1.4rem !important;
+        padding-right: 1.4rem !important;
+        padding-bottom: 2.5rem !important;
     }
 
     /* India.gov.in Top White Navbar */
     .india-nav {
         background: #FFFFFF;
         border-bottom: 1px solid #E2E8F0;
-        padding: 12px 24px;
-        margin-left: -1.5rem;
-        margin-right: -1.5rem;
+        padding: 12px 22px;
+        margin-left: -1.4rem;
+        margin-right: -1.4rem;
         display: flex;
         justify-content: space-between;
         align-items: center;
         flex-wrap: wrap;
-        gap: 12px;
+        gap: 10px;
     }
     .india-brand {
         display: flex;
@@ -79,78 +92,76 @@ st.markdown("""
         gap: 12px;
     }
     .india-logo-text {
-        font-size: 1.55rem;
+        font-size: 1.45rem;
         font-weight: 800;
-        color: #1E3A8A;
+        color: #1E3A8A !important;
         letter-spacing: -0.3px;
         line-height: 1.1;
     }
-    .india-logo-text span {
-        color: #D97706;
-    }
+    .india-logo-text span { color: #D97706 !important; }
     .india-logo-sub {
         font-size: 0.74rem;
-        color: #475569;
+        color: #475569 !important;
         font-weight: 600;
     }
     .india-nav-right {
         display: flex;
         align-items: center;
-        gap: 14px;
-        font-size: 0.82rem;
-        color: #334155;
+        gap: 12px;
+        font-size: 0.8rem;
+        color: #334155 !important;
         font-weight: 600;
-        flex-wrap: wrap;
-    }
-    .nav-search-pill {
-        background: #F8FAFC;
-        border: 1px solid #CBD5E1;
-        border-radius: 6px;
-        padding: 6px 14px;
-        color: #64748B;
-        font-size: 0.82rem;
-        min-width: 210px;
     }
     .nav-red-btn {
         background: #DC2626;
-        color: #FFFFFF;
-        padding: 6px 16px;
-        border-radius: 6px;
+        color: #FFFFFF !important;
+        padding: 5px 12px;
+        border-radius: 5px;
         font-weight: 700;
-        font-size: 0.82rem;
+        font-size: 0.76rem;
     }
     .tricolor-accent {
-        width: 26px;
-        height: 18px;
+        width: 24px;
+        height: 16px;
         background: linear-gradient(180deg, #FF9933 33%, #FFFFFF 33%, #FFFFFF 66%, #138808 66%);
         border: 1px solid #CBD5E1;
         border-radius: 2px;
     }
 
-    /* Hero Banner + Overlapping PM Quote Card (Exact india.gov.in style) */
+    /* Search Panel Box */
+    .search-banner {
+        background: #FFFFFF;
+        border: 1px solid #CBD5E1;
+        border-radius: 10px;
+        padding: 14px 18px;
+        margin-top: 12px;
+        margin-bottom: 12px;
+        box-shadow: 0 3px 10px rgba(15, 23, 42, 0.05);
+    }
+
+    /* Hero Banner + Quote Card */
     .hero-banner {
         background: linear-gradient(120deg, #1E1B4B 0%, #312E81 55%, #1E3A8A 100%);
-        margin-left: -1.5rem;
-        margin-right: -1.5rem;
-        padding: 28px 36px 56px 36px;
-        color: #FFFFFF;
+        margin-left: -1.4rem;
+        margin-right: -1.4rem;
+        padding: 24px 28px 50px 28px;
     }
     .quote-card-wrap {
         background: #FFFFFF;
         border-radius: 12px;
-        padding: 20px 28px;
-        box-shadow: 0 10px 28px rgba(15, 23, 42, 0.12);
+        padding: 18px 24px;
+        box-shadow: 0 8px 24px rgba(15, 23, 42, 0.1);
         border: 1px solid #E2E8F0;
         display: flex;
         align-items: center;
-        gap: 22px;
-        margin-top: -42px;
-        margin-bottom: 18px;
+        gap: 18px;
+        margin-top: -38px;
+        margin-bottom: 16px;
         flex-wrap: wrap;
     }
     .quote-avatar {
-        width: 74px;
-        height: 74px;
+        width: 66px;
+        height: 66px;
         border-radius: 50%;
         background: linear-gradient(135deg, #FEF3C7, #FDE68A);
         border: 3px solid #D97706;
@@ -161,55 +172,32 @@ st.markdown("""
         flex-shrink: 0;
     }
     .quote-text {
-        font-size: 1.02rem;
+        font-size: 0.96rem;
         font-weight: 600;
-        color: #1E293B;
+        color: #1E293B !important;
         line-height: 1.5;
         flex: 1;
-        min-width: 250px;
+        min-width: 240px;
     }
-    .quote-mark {
-        color: #DC2626;
-        font-size: 1.35rem;
-        font-weight: 900;
-    }
-    .quote-meta {
-        font-size: 0.8rem;
-        color: #64748B;
-        margin-top: 6px;
-        font-weight: 600;
-    }
+    .quote-mark { color: #DC2626 !important; font-size: 1.3rem; font-weight: 900; }
+    .quote-meta { font-size: 0.78rem; color: #64748B !important; margin-top: 5px; font-weight: 600; }
 
-    /* 6-Column National Stats Strip */
+    /* Stats Strip */
     .stats-strip {
         background: #FFFFFF;
         border: 1px solid #E2E8F0;
         border-radius: 12px;
-        padding: 18px 20px;
+        padding: 16px 18px;
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-        gap: 16px;
+        grid-template-columns: repeat(auto-fit, minmax(135px, 1fr));
+        gap: 12px;
         box-shadow: 0 4px 14px rgba(15, 23, 42, 0.05);
-        margin-bottom: 16px;
+        margin-bottom: 14px;
     }
-    .stat-item {
-        border-right: 1px solid #F1F5F9;
-        padding: 4px 10px;
-    }
-    .stat-item:last-child {
-        border-right: none;
-    }
-    .stat-num {
-        font-size: 1.45rem;
-        font-weight: 800;
-        color: #0F172A;
-    }
-    .stat-lbl {
-        font-size: 0.82rem;
-        color: #475569;
-        font-weight: 600;
-        margin-top: 2px;
-    }
+    .stat-item { border-right: 1px solid #F1F5F9; padding: 4px 8px; }
+    .stat-item:last-child { border-right: none; }
+    .stat-num { font-size: 1.38rem; font-weight: 800; color: #0F172A !important; }
+    .stat-lbl { font-size: 0.78rem; color: #475569 !important; font-weight: 600; }
 
     /* Moving Public Notice Bar */
     .marquee-container {
@@ -217,193 +205,121 @@ st.markdown("""
         border: 1px solid #F59E0B;
         border-left: 6px solid #DC2626;
         border-radius: 6px;
-        padding: 8px 14px;
+        padding: 8px 12px;
         display: flex;
         align-items: center;
-        gap: 12px;
+        gap: 10px;
         overflow: hidden;
-        margin-bottom: 14px;
+        margin-bottom: 12px;
     }
     .marquee-label {
         background: #DC2626;
-        color: #FFFFFF;
-        font-size: 0.75rem;
+        color: #FFFFFF !important;
+        font-size: 0.72rem;
         font-weight: 800;
-        padding: 4px 10px;
+        padding: 4px 9px;
         border-radius: 4px;
         white-space: nowrap;
     }
-    .marquee-track {
-        width: 100%;
-        overflow: hidden;
-        white-space: nowrap;
-    }
+    .marquee-track { width: 100%; overflow: hidden; white-space: nowrap; }
     .marquee-content {
         display: inline-block;
         padding-left: 100%;
-        animation: scrollLeft 36s linear infinite;
-        font-size: 0.86rem;
+        animation: scrollLeft 34s linear infinite;
+        font-size: 0.84rem;
         font-weight: 600;
-        color: #7F1D1D;
+        color: #7F1D1D !important;
     }
-    .marquee-content:hover {
-        animation-play-state: paused;
-    }
+    .marquee-content:hover { animation-play-state: paused; }
     @keyframes scrollLeft {
         0% { transform: translateX(0); }
         100% { transform: translateX(-100%); }
     }
 
-    /* Crimson Online Services Banner + Dual Portal Cards */
+    /* Gateway Cards */
     .services-banner {
         background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%);
-        color: #FFFFFF;
-        padding: 22px 26px;
-        border-radius: 12px;
-        margin-bottom: 16px;
+        padding: 18px 22px;
+        border-radius: 10px;
+        margin-bottom: 14px;
     }
-    .services-banner h2 {
-        margin: 0 0 6px 0;
-        font-size: 1.55rem;
-        font-weight: 800;
-        color: #FFFFFF;
-    }
-    .services-banner p {
-        margin: 0;
-        font-size: 0.9rem;
-        color: #FEE2E2;
-    }
+    .services-banner h2 { margin: 0 0 4px 0; font-size: 1.4rem; font-weight: 800; color: #FFFFFF !important; }
+    .services-banner p { margin: 0; font-size: 0.86rem; color: #FEE2E2 !important; }
     .portal-box {
         background: #FFFFFF;
         border: 1px solid #CBD5E1;
         border-top: 5px solid #1E3A8A;
         border-radius: 10px;
-        padding: 22px;
+        padding: 20px;
         box-shadow: 0 6px 18px rgba(15, 23, 42, 0.06);
-        min-height: 225px;
         margin-bottom: 10px;
+        animation: fadeSlideUp 0.45s ease-out;
     }
-    .portal-box-gov {
-        border-top-color: #DC2626;
-    }
-    .portal-tag {
-        font-size: 0.74rem;
-        font-weight: 800;
-        color: #DC2626;
-        text-transform: uppercase;
-        letter-spacing: 0.7px;
-        margin-bottom: 6px;
-    }
-    .portal-heading {
-        font-size: 1.35rem;
-        font-weight: 800;
-        color: #0F172A;
-        margin-bottom: 8px;
-    }
-    .portal-body {
-        font-size: 0.9rem;
-        color: #334155;
-        line-height: 1.55;
-        margin-bottom: 12px;
-    }
+    .portal-box-gov { border-top-color: #DC2626; }
+    .portal-tag { font-size: 0.72rem; font-weight: 800; color: #DC2626 !important; text-transform: uppercase; letter-spacing: 0.6px; margin-bottom: 5px; }
+    .portal-heading { font-size: 1.25rem; font-weight: 800; color: #0F172A !important; margin-bottom: 8px; }
+    .portal-body { font-size: 0.88rem; color: #334155 !important; line-height: 1.5; }
 
-    /* WhatsApp-Style Conversational Grievance UI */
-    .wa-header {
-        background: #075E54;
-        color: #FFFFFF;
-        padding: 12px 18px;
-        border-radius: 10px 10px 0 0;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
+    /* Animated Officer Auth Card */
+    @keyframes fadeSlideUp {
+        from { opacity: 0; transform: translateY(14px); }
+        to { opacity: 1; transform: translateY(0); }
     }
-    .wa-header-title {
-        font-weight: 700;
-        font-size: 1rem;
+    .auth-hero-card {
+        background: linear-gradient(135deg, #0F172A 0%, #1E3A8A 100%);
+        border-radius: 12px;
+        padding: 20px 24px;
+        margin-bottom: 16px;
+        border-bottom: 4px solid #F59E0B;
+        animation: fadeSlideUp 0.4s ease-out;
     }
-    .wa-header-sub {
-        font-size: 0.75rem;
-        color: #A7F3D0;
-    }
-    .wa-chat-bg {
-        background-color: #EFEAE2;
-        background-image: radial-gradient(#D5CEC2 1px, transparent 1px);
-        background-size: 16px 16px;
-        padding: 16px;
-        border-left: 1px solid #CBD5E1;
-        border-right: 1px solid #CBD5E1;
-        max-height: 460px;
-        overflow-y: auto;
-    }
-    .wa-bot-msg {
+    .auth-hero-card h3 { color: #FFFFFF !important; margin: 0 0 4px 0; font-size: 1.25rem; font-weight: 800; }
+    .auth-hero-card p { color: #CBD5E1 !important; margin: 0; font-size: 0.84rem; }
+
+    /* Clean Simple Citizen Form Card */
+    .citizen-card {
         background: #FFFFFF;
-        color: #111B21;
-        padding: 11px 15px;
-        border-radius: 0 12px 12px 12px;
-        max-width: 85%;
-        margin-bottom: 12px;
-        box-shadow: 0 1px 2px rgba(0,0,0,0.12);
-        font-size: 0.88rem;
-        line-height: 1.5;
+        border: 1px solid #CBD5E1;
+        border-top: 5px solid #075E54;
+        border-radius: 12px;
+        padding: 18px 20px;
+        box-shadow: 0 6px 20px rgba(15, 23, 42, 0.06);
+        animation: fadeSlideUp 0.4s ease-out;
     }
-    .wa-user-msg {
-        background: #D9FDD3;
-        color: #111B21;
-        padding: 11px 15px;
-        border-radius: 12px 0 12px 12px;
-        max-width: 82%;
-        margin-left: auto;
+    .warranty-strip {
+        background: #F0FDF4;
+        border: 1px solid #BBF7D0;
+        border-left: 4px solid #16A34A;
+        border-radius: 6px;
+        padding: 10px 12px;
+        font-size: 0.82rem;
+        color: #14532D !important;
         margin-bottom: 12px;
-        box-shadow: 0 1px 2px rgba(0,0,0,0.12);
-        font-size: 0.88rem;
-        line-height: 1.5;
-    }
-    .wa-time {
-        font-size: 0.68rem;
-        color: #667781;
-        text-align: right;
-        margin-top: 4px;
     }
     .section-heading {
-        font-size: 1.12rem;
+        font-size: 1.08rem;
         font-weight: 800;
-        color: #0F172A;
+        color: #0F172A !important;
         border-bottom: 2px solid #E2E8F0;
         padding-bottom: 6px;
-        margin-bottom: 14px;
+        margin-bottom: 12px;
     }
 
-    /* Mobile & Tablet Responsive Adjustments */
     @media (max-width: 768px) {
-        .block-container {
-            padding-left: 0.75rem !important;
-            padding-right: 0.75rem !important;
-        }
-        .india-nav {
-            margin-left: -0.75rem;
-            margin-right: -0.75rem;
-            padding: 10px 14px;
-        }
-        .hero-banner {
-            margin-left: -0.75rem;
-            margin-right: -0.75rem;
-            padding: 20px 16px 46px 16px;
-        }
-        .quote-card-wrap {
-            padding: 14px 16px;
-        }
-        .wa-bot-msg, .wa-user-msg {
-            max-width: 94%;
-        }
+        .block-container { padding-left: 0.7rem !important; padding-right: 0.7rem !important; }
+        .india-nav { margin-left: -0.7rem; margin-right: -0.7rem; padding: 10px 12px; }
+        .hero-banner { margin-left: -0.7rem; margin-right: -0.7rem; padding: 18px 14px 44px 14px; }
+        .quote-card-wrap { padding: 14px; }
+        .india-logo-text { font-size: 1.25rem; }
     }
 </style>
 """, unsafe_allow_html=True)
 
-# -------------------- TOP INDIA.GOV.IN STYLE NAVBAR --------------------
+# -------------------- TOP INDIA.GOV.IN NAVBAR --------------------
 st.markdown(f"""
 <div class="india-nav">
     <div class="india-brand">
-        <svg width="36" height="42" viewBox="0 0 64 76" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <svg width="34" height="40" viewBox="0 0 64 76" fill="none" xmlns="http://www.w3.org/2000/svg">
             <circle cx="32" cy="24" r="14" stroke="#1E3A8A" stroke-width="3.5"/>
             <circle cx="32" cy="24" r="3" fill="#1E3A8A"/>
             <line x1="32" y1="10" x2="32" y2="38" stroke="#1E3A8A" stroke-width="2"/>
@@ -419,21 +335,63 @@ st.markdown(f"""
         </div>
     </div>
     <div class="india-nav-right">
-        <span class="nav-search-pill">Search Wards, Tickets & Services</span>
         <span class="nav-red-btn">NIC VERIFIED</span>
-        <span>Skip to main content</span>
-        <span>|</span>
         <span>अ / A</span>
         <div class="tricolor-accent"></div>
     </div>
 </div>
 """, unsafe_allow_html=True)
 
-# Fetch live numbers for the 6-column National Portal KPI strip
+# -------------------- WORKING INTERACTIVE SEARCH BAR (TICKET ID OR WARD) --------------------
 all_rows = fetch_all_complaints()
+
+with st.container():
+    st.markdown('<div class="search-banner">', unsafe_allow_html=True)
+    s_col1, s_col2, s_col3 = st.columns([3.2, 1.4, 1])
+    q_input = s_col1.text_input(
+        "Search Portal",
+        value=st.session_state["search_query"],
+        placeholder="Search by Ticket ID (e.g., SS-2026-101) or Ward No / Name (e.g., Ward 28, Boring Road)...",
+        label_visibility="collapsed"
+    )
+    ward_filter_options = ["All Wards"] + [w["name"] for w in city_cfg["wards"]]
+    quick_ward = s_col2.selectbox("Quick Ward Filter", ward_filter_options, label_visibility="collapsed")
+    search_clicked = s_col3.button("Search", type="primary", use_container_width=True)
+    st.markdown('</div>', unsafe_allow_html=True)
+
+    # Trigger search if button clicked, text typed, or specific ward chosen from dropdown
+    active_search = q_input.strip() if (search_clicked or q_input.strip()) else (quick_ward if quick_ward != "All Wards" else "")
+    if active_search:
+        st.session_state["search_query"] = q_input.strip()
+        matches = [
+            r for r in all_rows
+            if active_search.lower() in r[1].lower() or active_search.lower() in r[4].lower() or active_search.lower() in r[7].lower()
+        ]
+        with st.container(border=True):
+            sh1, sh2 = st.columns([4, 1])
+            sh1.markdown(f"**Search Results for `{active_search}` — Total Complaints Found: `{len(matches)}`**")
+            if sh2.button("Clear Search", use_container_width=True):
+                st.session_state["search_query"] = ""
+                st.rerun()
+
+            if not matches:
+                st.info("No complaints matched your search. Try searching `SS-2026-101`, `Ward 28`, `Ward 22`, or `Ward 41`.")
+            else:
+                m_active = sum(1 for m in matches if m[18] != "Resolved")
+                m_resolved = sum(1 for m in matches if m[18] == "Resolved")
+                sm1, sm2, sm3 = st.columns(3)
+                sm1.metric("Total Complaints", len(matches))
+                sm2.metric("Active / Pending", m_active)
+                sm3.metric("Resolved", m_resolved)
+
+                for m in matches:
+                    st.markdown(
+                        f"• **`{m[1]}`** | **{m[7]}** — *{m[4]}* | Status: **`{m[18]}`** | Severity: `{m[8]}/10` | Citizens Affected: `{m[17]}`"
+                    )
+
+# Live Stats Calculation
 total_tickets = len(all_rows)
 active_tickets = sum(1 for r in all_rows if r[18] != "Resolved")
-critical_tickets = sum(1 for r in all_rows if r[8] >= 8 and r[18] != "Resolved")
 duplicates_prevented = sum(max(0, r[17] - 1) for r in all_rows)
 resolved_tickets = sum(1 for r in all_rows if r[18] == "Resolved")
 citizen_engagements = sum(r[17] for r in all_rows)
@@ -441,22 +399,22 @@ citizen_engagements = sum(r[17] for r in all_rows)
 # -------------------- HERO BANNER + OVERLAPPING QUOTE CARD + 6 STATS --------------------
 st.markdown(f"""
 <div class="hero-banner">
-    <div style="font-size:0.78rem; color:#FDBA74; font-weight:700; letter-spacing:1px; text-transform:uppercase;">
+    <div style="font-size:0.76rem; color:#FDBA74 !important; font-weight:700; letter-spacing:1px; text-transform:uppercase;">
         {city_cfg['ministry_header']}
     </div>
-    <div style="font-size:1.65rem; font-weight:800; margin-top:4px;">
+    <div style="font-size:1.5rem; font-weight:800; color:#FFFFFF !important; margin-top:4px;">
         Unified Municipal Civic Redressal & Public Accountability Grid
     </div>
 </div>
 
 <div class="quote-card-wrap">
     <div class="quote-avatar">
-        <svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="#92400E" stroke-width="2">
+        <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#92400E" stroke-width="2">
             <path d="M12 2L2 7l10 5 10-5-10-5z"/>
             <path d="M2 17l10 5 10-5"/>
             <path d="M2 12l10 5 10-5"/>
         </svg>
-        <span style="font-size:0.6rem; font-weight:800; color:#78350F;">GOV.IN</span>
+        <span style="font-size:0.58rem; font-weight:800; color:#78350F !important;">GOV.IN</span>
     </div>
     <div class="quote-text">
         <span class="quote-mark">“</span>
@@ -468,30 +426,12 @@ st.markdown(f"""
 </div>
 
 <div class="stats-strip">
-    <div class="stat-item">
-        <div class="stat-num">5</div>
-        <div class="stat-lbl">Online Civic Services</div>
-    </div>
-    <div class="stat-item">
-        <div class="stat-num">{len(city_cfg['wards'])}</div>
-        <div class="stat-lbl">Municipal Wards</div>
-    </div>
-    <div class="stat-item">
-        <div class="stat-num">{citizen_engagements}</div>
-        <div class="stat-lbl">Citizen Engagements</div>
-    </div>
-    <div class="stat-item">
-        <div class="stat-num">{active_tickets}</div>
-        <div class="stat-lbl">Active Grievances</div>
-    </div>
-    <div class="stat-item">
-        <div class="stat-num">{duplicates_prevented}</div>
-        <div class="stat-lbl">Duplicates Merged</div>
-    </div>
-    <div class="stat-item">
-        <div class="stat-num">{resolved_tickets}</div>
-        <div class="stat-lbl">AI-Verified Closures</div>
-    </div>
+    <div class="stat-item"><div class="stat-num">5</div><div class="stat-lbl">Online Civic Services</div></div>
+    <div class="stat-item"><div class="stat-num">{len(city_cfg['wards'])}</div><div class="stat-lbl">Municipal Wards</div></div>
+    <div class="stat-item"><div class="stat-num">{citizen_engagements}</div><div class="stat-lbl">Citizen Engagements</div></div>
+    <div class="stat-item"><div class="stat-num">{active_tickets}</div><div class="stat-lbl">Active Grievances</div></div>
+    <div class="stat-item"><div class="stat-num">{duplicates_prevented}</div><div class="stat-lbl">Duplicates Merged</div></div>
+    <div class="stat-item"><div class="stat-num">{resolved_tickets}</div><div class="stat-lbl">AI-Verified Closures</div></div>
 </div>
 """, unsafe_allow_html=True)
 
@@ -501,7 +441,7 @@ if top_notices:
     ticker_items = " &nbsp;&nbsp;&nbsp;|&nbsp;&nbsp;&nbsp; ".join(
         [f"[{idx+1}] {n[2]} ({n[1]}): {n[3]}" for idx, n in enumerate(top_notices)]
     )
-    t_col1, t_col2 = st.columns([6, 1])
+    t_col1, t_col2 = st.columns([5.5, 1.2])
     with t_col1:
         st.markdown(f"""
         <div class="marquee-container">
@@ -537,14 +477,14 @@ if st.session_state["active_view"] == "home":
         st.markdown("""
         <div class="portal-box">
             <div class="portal-tag">CITIZEN SERVICES • PUBLIC ACCESS</div>
-            <div class="portal-heading">Citizen Civic Assistant & Tracking Portal</div>
+            <div class="portal-heading">Citizen Civic Grievance & Tracking Portal</div>
             <div class="portal-body">
-                Report road potholes, uncollected garbage, hanging electric wires, or waterlogging through a simple
-                WhatsApp-style conversational assistant. Inspect ward contractor warranty records and track live resolutions.
+                Register road potholes, uncollected garbage, hanging electric wires, or waterlogging in 3 simple steps.
+                View ward contractor warranty records and track live resolutions with Before/After proof.
             </div>
         </div>
         """, unsafe_allow_html=True)
-        if st.button("Open Citizen Chat Assistant & Ticket Tracker", type="primary", use_container_width=True):
+        if st.button("Open Citizen Grievance & Tracking Portal", type="primary", use_container_width=True):
             st.session_state["active_view"] = "citizen"
             st.rerun()
 
@@ -555,136 +495,110 @@ if st.session_state["active_view"] == "home":
             <div class="portal-heading">Department Command Center & Audit Dashboard</div>
             <div class="portal-body">
                 Secured portal for Municipal Commissioners, Ward Engineers, and Department Officers. Access live geo-spatial
-                heatmaps, verify Before/After photographic closure proofs, publish public notices, and export RTI logs.
+                heatmaps, verify Before/After closure proofs, publish public notices, and export RTI logs.
             </div>
         </div>
         """, unsafe_allow_html=True)
-        if st.button("Enter Government Department Portal (Officer Sign-In / Register)", use_container_width=True):
+        if st.button("Enter Government Department Portal (Officer Login / Register)", use_container_width=True):
             st.session_state["active_view"] = "gov"
             st.rerun()
 
-# ==================== VIEW 2: WHATSAPP-STYLE CITIZEN PORTAL PAGE ====================
+# ==================== VIEW 2: SIMPLE & ATTRACTIVE CITIZEN PORTAL ====================
 elif st.session_state["active_view"] == "citizen":
     nav1, nav2 = st.columns([1.2, 5])
     if nav1.button("Back to Home", use_container_width=True):
         st.session_state["active_view"] = "home"
         st.rerun()
-    nav2.markdown("#### Online Services > Citizen Civic Assistant & Public Verification")
+    nav2.markdown("#### Online Services > Citizen Civic Grievance & Tracking Portal")
     st.divider()
 
-    chat_col, track_col = st.columns([1.2, 1], gap="large")
+    c_left, c_right = st.columns([1.15, 1], gap="large")
 
-    # Left: WhatsApp-Style Conversational Grievance Bot
-    with chat_col:
+    # Left: Simple, Clean, Mobile-Friendly Citizen Complaint Card
+    with c_left:
+        st.markdown('<div class="citizen-card">', unsafe_allow_html=True)
+        st.markdown('<div class="section-heading">Register a Civic Complaint (3 Simple Steps)</div>', unsafe_allow_html=True)
+
         ward_names = [w["name"] for w in city_cfg["wards"]]
-        selected_ward = st.selectbox("Step 1: Select Your Municipal Ward / Area", ward_names)
+        selected_ward = st.selectbox("1. Select Your Ward / Area", ward_names)
         ward_meta = get_ward_contractor_info(selected_ward)
 
-        # Render WhatsApp Header & Chat Bubbles
         st.markdown(f"""
-        <div class="wa-header">
-            <div>
-                <div class="wa-header-title">SarkariSewa Civic Sahayak (Official AI Bot)</div>
-                <div class="wa-header-sub">Online • Instant AI Audit & Municipal Dispatch • {selected_ward}</div>
-            </div>
-            <div style="font-size:0.75rem; background:rgba(255,255,255,0.16); padding:4px 10px; border-radius:12px;">
-                Verified Gov.in
-            </div>
+        <div class="warranty-strip">
+            <b>Accountable Contractor:</b> {ward_meta['contractor']} (Rating: {ward_meta['rating']}/5) &nbsp;|&nbsp;
+            <b>Warranty Valid Till:</b> <code>{ward_meta['warranty_valid_till']}</code>
         </div>
-        <div class="wa-chat-bg">
-            <div class="wa-bot-msg">
-                <b>Namaste! Welcome to SarkariSewa Civic Assistant.</b><br>
-                You selected <b>{selected_ward}</b>.<br>
-                • <b>Responsible Contractor:</b> {ward_meta['contractor']} (Rating: {ward_meta['rating']}/5)<br>
-                • <b>Road/Civic Warranty:</b> Valid till <code>{ward_meta['warranty_valid_till']}</code> (Budget: {ward_meta['sanctioned_budget']})<br><br>
-                Please upload a photo of the problem below or type/tap your issue to register an official complaint.
-                <div class="wa-time">AI Sahayak • Ready</div>
-            </div>
         """, unsafe_allow_html=True)
 
-        # Show past chat messages in this session
-        for msg in st.session_state["chat_history"][-4:]:
-            if msg["role"] == "user":
-                st.markdown(f'<div class="wa-user-msg">{msg["text"]}<div class="wa-time">Citizen ✓✓</div></div>', unsafe_allow_html=True)
+        issue_choice = st.selectbox("2. Choose Issue Type", [
+            "Pothole & Road Damage",
+            "Garbage Overflow",
+            "Hanging Electric Wire",
+            "Waterlogging & Drain Block",
+            "Streetlight Failure"
+        ])
+
+        user_note = st.text_area(
+            "3. Describe Location / Problem (Hindi or English)",
+            height=90,
+            placeholder="e.g., Hospital gate ke samne sadak par bada gaddha hai..."
+        )
+
+        uploaded_img = st.file_uploader("4. Attach Photo Proof (Optional — JPG / PNG)", type=["jpg", "jpeg", "png"])
+
+        if st.button("Submit Complaint to Municipal AI", type="primary", use_container_width=True):
+            final_note = f"{issue_choice}: {user_note.strip()}" if user_note.strip() else f"{issue_choice} reported at {selected_ward}."
+            img_bytes = uploaded_img.read() if uploaded_img else None
+
+            with st.spinner("AI Auditor verifying issue & generating official work order..."):
+                vision_out, work_order_txt = analyze_civic_issue(img_bytes, final_note, selected_ward)
+
+            if not vision_out.get("is_valid_civic_issue", True):
+                st.error(f"Rejected by AI Authenticity Filter: {vision_out.get('rejection_reason', 'Please upload a valid civic photo.')}")
             else:
-                st.markdown(f'<div class="wa-bot-msg">{msg["text"]}<div class="wa-time">AI Sahayak • Verified</div></div>', unsafe_allow_html=True)
+                b64_before = bytes_to_b64(img_bytes)
+                db_res = save_or_merge_complaint(
+                    ward=selected_ward,
+                    lat=float(ward_meta["lat"]),
+                    lon=float(ward_meta["lon"]),
+                    category=vision_out["category"],
+                    severity=vision_out["severity"],
+                    department=vision_out["department"],
+                    summary=vision_out["visual_findings"],
+                    work_order=work_order_txt,
+                    before_img_b64=b64_before
+                )
+                st.session_state["citizen_receipt"] = {
+                    "vision": vision_out,
+                    "work_order": work_order_txt,
+                    "db": db_res,
+                    "contractor": ward_meta["contractor"]
+                }
 
-        st.markdown("</div>", unsafe_allow_html=True)
+        if "citizen_receipt" in st.session_state:
+            rec = st.session_state["citizen_receipt"]
+            v = rec["vision"]
+            d = rec["db"]
+            st.success(f"Complaint Registered! Reference ID: {d['ticket_code']} | Routed to: {v['department']}")
+            if d["merged"]:
+                st.info(f"Merged with nearby report ({d['ticket_code']}). Citizens Affected count is now {d['impact_count']}.")
+            st.write(f"**Severity:** `{v['severity']}/10` | **Contractor:** `{rec['contractor']}`")
+            with st.expander("View Bilingual Official Work Order"):
+                st.code(rec["work_order"], language="markdown")
 
-        # Chat Input Controls right below the WhatsApp chat box
-        with st.container(border=True):
-            uploaded_img = st.file_uploader("Attach Photo Evidence (Optional — JPG/PNG)", type=["jpg", "jpeg", "png"])
-            inp_c1, inp_c2 = st.columns([3.5, 1])
-            user_msg = inp_c1.text_input("Type a message (Hindi / English)...", label_visibility="collapsed", placeholder="Type message: e.g., Main road par bada gaddha hai...")
-            send_clicked = inp_c2.button("Send ➤", type="primary", use_container_width=True)
+        st.markdown('</div>', unsafe_allow_html=True)
 
-            st.caption("Quick Tap Issues:")
-            q1, q2, q3 = st.columns(3)
-            quick_msg = None
-            if q1.button("Report Pothole", use_container_width=True):
-                quick_msg = "Deep pothole on main road obstructing vehicles."
-            if q2.button("Report Live Wire", use_container_width=True):
-                quick_msg = "Low-hanging sparking electric wire near Hospital gate."
-            if q3.button("Report Garbage", use_container_width=True):
-                quick_msg = "Uncollected garbage dump overflowing onto road."
-
-            final_msg = quick_msg if quick_msg else (user_msg if send_clicked else None)
-            if final_msg or (send_clicked and uploaded_img):
-                text_to_send = final_msg or "Uploaded street photo for civic inspection."
-                img_bytes = uploaded_img.read() if uploaded_img else None
-
-                st.session_state["chat_history"].append({"role": "user", "text": text_to_send})
-
-                with st.spinner("AI Sahayak is auditing photo & generating municipal work order..."):
-                    vision_out, work_order_txt = analyze_civic_issue(img_bytes, text_to_send, selected_ward)
-
-                if not vision_out.get("is_valid_civic_issue", True):
-                    bot_reply = f"<b>Submission Rejected:</b> {vision_out.get('rejection_reason', 'Please upload a valid outdoor civic infrastructure photo.')}"
-                else:
-                    b64_before = bytes_to_b64(img_bytes)
-                    db_res = save_or_merge_complaint(
-                        ward=selected_ward,
-                        lat=float(ward_meta["lat"]),
-                        lon=float(ward_meta["lon"]),
-                        category=vision_out["category"],
-                        severity=vision_out["severity"],
-                        department=vision_out["department"],
-                        summary=vision_out["visual_findings"],
-                        work_order=work_order_txt,
-                        before_img_b64=b64_before
-                    )
-                    merge_note = (
-                        f"Linked to existing nearby report <b>{db_res['ticket_code']}</b> (Citizen Impact Count boosted to <b>{db_res['impact_count']}</b>)."
-                        if db_res["merged"]
-                        else f"New Official Reference ID: <b>{db_res['ticket_code']}</b>"
-                    )
-                    bot_reply = (
-                        f"<b>Grievance Registered & Dispatched!</b><br>"
-                        f"• {merge_note}<br>"
-                        f"• <b>Category:</b> {vision_out['category']} (Severity: <b>{vision_out['severity']}/10</b>)<br>"
-                        f"• <b>Assigned Dept:</b> {vision_out['department']}<br>"
-                        f"• <b>Contractor Liable:</b> {ward_meta['contractor']}<br>"
-                        f"• <b>Audit Note:</b> {vision_out['visual_findings']}"
-                    )
-                    st.session_state["last_work_order"] = work_order_txt
-
-                st.session_state["chat_history"].append({"role": "bot", "text": bot_reply})
-                st.rerun()
-
-        if "last_work_order" in st.session_state:
-            with st.expander("View Generated Official Bilingual Work Order", expanded=False):
-                st.code(st.session_state["last_work_order"], language="markdown")
-
-    # Right: Ticket Tracking & Citizen Re-Open Veto
-    with track_col:
-        st.markdown('<div class="section-heading">Track Grievance & Public Verification Ledger</div>', unsafe_allow_html=True)
-        st.caption("Sample Ticket IDs: SS-2026-101, SS-2026-102, SS-2026-103, SS-2026-104")
-        track_id = st.text_input("Enter Grievance Reference ID", value="SS-2026-104")
+    # Right: Clean Ticket Tracking & Re-Open Veto
+    with c_right:
+        st.markdown('<div class="citizen-card">', unsafe_allow_html=True)
+        st.markdown('<div class="section-heading">Track Your Complaint Status</div>', unsafe_allow_html=True)
+        st.caption("Sample IDs: SS-2026-101, SS-2026-102, SS-2026-103, SS-2026-104")
+        track_id = st.text_input("Enter Complaint Reference ID", value="SS-2026-104")
 
         if track_id.strip():
             ticket = get_complaint_by_ticket(track_id)
             if not ticket:
-                st.warning("No grievance found with this Reference ID.")
+                st.warning("No complaint found with this Reference ID.")
             else:
                 (
                     tid, tcode, created, sla, tward, tcat, tsev, tdept,
@@ -692,30 +606,30 @@ elif st.session_state["active_view"] == "citizen":
                     tstatus, treopen, b_img, a_img
                 ) = ticket
 
-                with st.container(border=True):
-                    st.markdown(f"**Reference ID:** `{tcode}` &nbsp;|&nbsp; **Status:** `{tstatus}` &nbsp;|&nbsp; **Citizens Affected:** `{timpact}`")
-                    st.write(f"**Ward:** {tward}")
-                    st.write(f"**Department:** {tdept} &nbsp;|&nbsp; **SLA Deadline:** `{sla}`")
-                    st.write(f"**Contractor:** {tcontractor}")
-                    st.write(f"**Observation:** {tsum}")
+                st.markdown(f"**Ticket ID:** `{tcode}` | **Status:** `{tstatus}` | **Citizens Affected:** `{timpact}`")
+                st.write(f"**Ward:** {tward}")
+                st.write(f"**Department:** {tdept} | **SLA Deadline:** `{sla}`")
+                st.write(f"**Contractor:** {tcontractor}")
+                st.write(f"**Details:** {tsum}")
 
-                    if tclosure:
-                        st.success(f"AI Closure Audit: {tclosure}")
+                if tclosure:
+                    st.success(f"AI Closure Verification: {tclosure}")
 
-                    if b_img or a_img:
-                        ic1, ic2 = st.columns(2)
-                        if b_img:
-                            ic1.image(base64.b64decode(b_img), caption="Before (Citizen Evidence)", use_container_width=True)
-                        if a_img:
-                            ic2.image(base64.b64decode(a_img), caption="After (Officer Proof)", use_container_width=True)
+                if b_img or a_img:
+                    ic1, ic2 = st.columns(2)
+                    if b_img:
+                        ic1.image(base64.b64decode(b_img), caption="Before (Citizen Photo)", use_container_width=True)
+                    if a_img:
+                        ic2.image(base64.b64decode(a_img), caption="After (Officer Proof)", use_container_width=True)
 
-                    if tstatus == "Resolved":
-                        if st.button(f"Not Satisfied? Contest & Re-Open ({tcode})", key=f"reopen_{tcode}", use_container_width=True):
-                            reopen_complaint_by_citizen(tcode)
-                            st.error(f"Ticket {tcode} RE-OPENED and escalated to Municipal Commissioner (Severity 10/10).")
-                            st.rerun()
+                if tstatus == "Resolved":
+                    if st.button(f"Not Satisfied? Re-Open Complaint ({tcode})", key=f"reopen_{tcode}", use_container_width=True):
+                        reopen_complaint_by_citizen(tcode)
+                        st.error(f"Complaint {tcode} RE-OPENED and escalated to Municipal Commissioner (Severity 10/10).")
+                        st.rerun()
+        st.markdown('</div>', unsafe_allow_html=True)
 
-# ==================== VIEW 3: SECURED GOVERNMENT DEPARTMENT PORTAL ====================
+# ==================== VIEW 3: ANIMATED & SECURED GOVERNMENT PORTAL ====================
 elif st.session_state["active_view"] == "gov":
     nav1, nav2 = st.columns([1.2, 5])
     if nav1.button("Back to Home", use_container_width=True):
@@ -723,48 +637,55 @@ elif st.session_state["active_view"] == "gov":
         st.rerun()
 
     if st.session_state["gov_officer"] is None:
-        nav2.markdown("#### Online Services > Government Department Portal — Official Authentication")
-        st.divider()
+        nav2.markdown("#### Online Services > Government Department Portal")
 
-        auth_col1, auth_col2 = st.columns(2, gap="large")
-        with auth_col1:
-            st.markdown('<div class="section-heading">Authorized Officer Sign-In</div>', unsafe_allow_html=True)
-            st.caption("Default Evaluation Credentials — Officer ID: `PMC-ADMIN-01` | Password: `Gov@2026`")
-            login_id = st.text_input("Government Officer ID", value="PMC-ADMIN-01")
-            login_pwd = st.text_input("Secured Password", type="password", value="Gov@2026")
-            if st.button("Authenticate & Enter Command Center", type="primary", use_container_width=True):
-                officer = verify_officer_login(login_id, login_pwd)
-                if officer:
-                    st.session_state["gov_officer"] = {
-                        "officer_id": officer[0],
-                        "full_name": officer[1],
-                        "department": officer[2],
-                        "designation": officer[3]
-                    }
-                    st.rerun()
-                else:
-                    st.error("Authentication Failed: Invalid Officer ID or Password.")
+        st.markdown("""
+        <div class="auth-hero-card">
+            <h3>Municipal Command Center — Secured Officer Gateway</h3>
+            <p>Authorized personnel sign-in and departmental onboarding portal (NIC Encryption Standard)</p>
+        </div>
+        """, unsafe_allow_html=True)
 
-        with auth_col2:
-            st.markdown('<div class="section-heading">New Department Officer Registration</div>', unsafe_allow_html=True)
-            reg_id = st.text_input("Assign Officer ID (e.g., PWD-JE-04)")
-            reg_name = st.text_input("Officer Full Name")
-            reg_dept = st.selectbox("Department Wing", [
-                "All Departments",
-                "PWD (Public Works Dept)",
-                "Nagar Nigam Sanitation",
-                "Electricity Board (DISCOM)",
-                "Water & Drainage Wing",
-                "Municipal Electrical Wing"
-            ])
-            reg_desig = st.text_input("Official Designation (e.g., Executive Engineer)")
-            reg_pwd = st.text_input("Create Secured Password (min 6 chars)", type="password")
-            if st.button("Register Departmental Account", use_container_width=True):
-                ok, msg = register_officer(reg_id, reg_name, reg_dept, reg_desig, reg_pwd)
-                if ok:
-                    st.success(msg)
-                else:
-                    st.error(msg)
+        auth_tab1, auth_tab2 = st.tabs(["Authorized Officer Sign-In", "New Department Officer Registration"])
+
+        with auth_tab1:
+            with st.container(border=True):
+                st.info("Demo Login Credentials — Officer ID: `PMC-ADMIN-01` | Password: `Gov@2026`")
+                login_id = st.text_input("Government Officer ID", value="PMC-ADMIN-01")
+                login_pwd = st.text_input("Secured Password", type="password", value="Gov@2026")
+                if st.button("Authenticate & Enter Command Center", type="primary", use_container_width=True):
+                    officer = verify_officer_login(login_id, login_pwd)
+                    if officer:
+                        st.session_state["gov_officer"] = {
+                            "officer_id": officer[0],
+                            "full_name": officer[1],
+                            "department": officer[2],
+                            "designation": officer[3]
+                        }
+                        st.rerun()
+                    else:
+                        st.error("Authentication Failed: Invalid Officer ID or Password.")
+
+        with auth_tab2:
+            with st.container(border=True):
+                reg_id = st.text_input("Assign Officer ID (e.g., PWD-JE-04)")
+                reg_name = st.text_input("Officer Full Name")
+                reg_dept = st.selectbox("Department Wing", [
+                    "All Departments",
+                    "PWD (Public Works Dept)",
+                    "Nagar Nigam Sanitation",
+                    "Electricity Board (DISCOM)",
+                    "Water & Drainage Wing",
+                    "Municipal Electrical Wing"
+                ])
+                reg_desig = st.text_input("Official Designation (e.g., Executive Engineer)")
+                reg_pwd = st.text_input("Create Secured Password (min 6 chars)", type="password")
+                if st.button("Register Departmental Account", type="primary", use_container_width=True):
+                    ok, msg = register_officer(reg_id, reg_name, reg_dept, reg_desig, reg_pwd)
+                    if ok:
+                        st.success(msg)
+                    else:
+                        st.error(msg)
 
     else:
         off = st.session_state["gov_officer"]
@@ -799,7 +720,7 @@ elif st.session_state["active_view"] == "gov":
             <head>
                 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
                 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-                <style>body {{ margin:0; padding:0; }} #map {{ height: 370px; width: 100%; border-radius: 6px; border: 1px solid #CBD5E1; }}</style>
+                <style>body {{ margin:0; padding:0; }} #map {{ height: 350px; width: 100%; border-radius: 6px; border: 1px solid #CBD5E1; }}</style>
             </head>
             <body>
                 <div id="map"></div>
@@ -823,7 +744,7 @@ elif st.session_state["active_view"] == "gov":
             </body>
             </html>
             """
-            components.html(leaflet_html, height=380)
+            components.html(leaflet_html, height=360)
 
             st.markdown('<div class="section-heading">Public Advisory Broadcast & RTI Audit Export</div>', unsafe_allow_html=True)
             b_col1, b_col2 = st.columns([1, 1.4])
@@ -870,9 +791,9 @@ elif st.session_state["active_view"] == "gov":
 
                 priority_label = "CRITICAL" if rsev >= 8 else ("HIGH" if rsev >= 6 else "STANDARD")
                 with st.expander(f"[{priority_label}] {tcode} | {rcat} — {rward} ({rimpact} Reports)"):
-                    st.write(f"**Department:** {rdept} &nbsp;|&nbsp; **Severity:** {rsev}/10 &nbsp;|&nbsp; **Status:** `{rstatus}`")
-                    st.write(f"**Contractor:** {rcontractor} &nbsp;|&nbsp; **Liability:** `{rwarranty}`")
-                    st.write(f"**SLA Deadline:** `{sla}` &nbsp;|&nbsp; **Citizen Re-Opens:** `{rreopen}`")
+                    st.write(f"**Department:** {rdept} | **Severity:** {rsev}/10 | **Status:** `{rstatus}`")
+                    st.write(f"**Contractor:** {rcontractor} | **Liability:** `{rwarranty}`")
+                    st.write(f"**SLA Deadline:** `{sla}` | **Citizen Re-Opens:** `{rreopen}`")
                     st.write(f"**Technical Summary:** {rsum}")
 
                     st.text_area("Official Dispatch Order", rwo, height=110, key=f"wo_view_{tcode}")
