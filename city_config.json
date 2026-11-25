@@ -1,0 +1,57 @@
+{
+  "portal_name": "SarkariSewa AI",
+  "ministry_header": "Ministry of Housing & Urban Affairs | Smart City Mission",
+  "city_name": "Patna Municipal Corporation (PMC)",
+  "map_center": {
+    "lat": 25.5941,
+    "lon": 85.1376,
+    "zoom": 13
+  },
+  "wards": [
+    {
+      "name": "Ward 14 - Bailey Road & Secretariat",
+      "lat": 25.6052,
+      "lon": 85.1124,
+      "contractor": "Bihar InfraBuild Pvt Ltd",
+      "warranty_valid_till": "2027-08-15",
+      "sanctioned_budget": "₹42.5 Lakhs",
+      "rating": 4.2
+    },
+    {
+      "name": "Ward 22 - Boring Road Crossing",
+      "lat": 25.6118,
+      "lon": 85.1189,
+      "contractor": "Magadh Roadways Corp",
+      "warranty_valid_till": "2027-03-10",
+      "sanctioned_budget": "₹68.0 Lakhs",
+      "rating": 3.5
+    },
+    {
+      "name": "Ward 28 - Patna Junction & Fraser Road",
+      "lat": 25.6025,
+      "lon": 85.1378,
+      "contractor": "Patliputra Civic Works",
+      "warranty_valid_till": "2026-12-30",
+      "sanctioned_budget": "₹85.0 Lakhs",
+      "rating": 2.9
+    },
+    {
+      "name": "Ward 35 - Kankarbagh Main Road",
+      "lat": 25.5912,
+      "lon": 85.1520,
+      "contractor": "Ganga Urban Developers",
+      "warranty_valid_till": "2027-11-20",
+      "sanctioned_budget": "₹54.0 Lakhs",
+      "rating": 4.5
+    },
+    {
+      "name": "Ward 41 - Rajendra Nagar & Hospital Zone",
+      "lat": 25.6010,
+      "lon": 85.1615,
+      "contractor": "Sone Valley Constructions",
+      "warranty_valid_till": "2027-05-01",
+      "sanctioned_budget": "₹39.0 Lakhs",
+      "rating": 3.8
+    }
+  ]
+}
