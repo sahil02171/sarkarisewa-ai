@@ -38,13 +38,12 @@ if "show_all_notices" not in st.session_state:
     st.session_state["show_all_notices"] = False
 if "gov_officer" not in st.session_state:
     st.session_state["gov_officer"] = None
-if "search_query" not in st.session_state:
-    st.session_state["search_query"] = ""
+if "submitted_search" not in st.session_state:
+    st.session_state["submitted_search"] = ""
 
-# -------------------- FULL-WIDTH RESPONSIVE + ANTI-DARK-MODE CSS --------------------
+# -------------------- FULL-WIDTH RESPONSIVE + PREMIUM CENTERED HEADER CSS --------------------
 st.markdown("""
 <style>
-    /* Force crisp Light Theme across all mobile/desktop browsers */
     header[data-testid="stHeader"] { display: none !important; }
     .stApp, [data-testid="stAppViewContainer"] {
         background-color: #F4F6F9 !important;
@@ -53,7 +52,6 @@ st.markdown("""
     .stApp p, .stApp label, .stApp span, .stApp div, .stMarkdown, .stCaption {
         color: #0F172A;
     }
-    /* Fix Streamlit inputs on mobile dark browsers */
     input, textarea, select, [data-baseweb="select"] > div, [data-baseweb="input"] > div {
         background-color: #FFFFFF !important;
         color: #0F172A !important;
@@ -73,70 +71,65 @@ st.markdown("""
         padding-bottom: 2.5rem !important;
     }
 
-    /* India.gov.in Top White Navbar */
-    .india-nav {
-        background: #FFFFFF;
-        border-bottom: 1px solid #E2E8F0;
-        padding: 12px 22px;
+    /* Centered Premium Government Brand Header */
+    .india-center-header {
+        background: linear-gradient(180deg, #FFFFFF 0%, #FFFDF7 100%);
+        border-bottom: 4px solid #D97706;
+        padding: 20px 18px 18px 18px;
         margin-left: -1.4rem;
         margin-right: -1.4rem;
-        display: flex;
-        justify-content: space-between;
+        margin-bottom: 14px;
+        text-align: center;
+        box-shadow: 0 4px 16px rgba(15, 23, 42, 0.06);
+    }
+    .tricolor-top-line {
+        height: 5px;
+        background: linear-gradient(90deg, #FF9933 33.33%, #FFFFFF 33.33%, #FFFFFF 66.66%, #138808 66.66%);
+        margin: -20px -18px 16px -18px;
+    }
+    .center-emblem-wrap {
+        display: inline-flex;
+        flex-direction: column;
         align-items: center;
-        flex-wrap: wrap;
-        gap: 10px;
-    }
-    .india-brand {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-    }
-    .india-logo-text {
-        font-size: 1.45rem;
-        font-weight: 800;
-        color: #1E3A8A !important;
-        letter-spacing: -0.3px;
-        line-height: 1.1;
-    }
-    .india-logo-text span { color: #D97706 !important; }
-    .india-logo-sub {
-        font-size: 0.74rem;
-        color: #475569 !important;
-        font-weight: 600;
-    }
-    .india-nav-right {
-        display: flex;
-        align-items: center;
-        gap: 12px;
-        font-size: 0.8rem;
-        color: #334155 !important;
-        font-weight: 600;
-    }
-    .nav-red-btn {
-        background: #DC2626;
-        color: #FFFFFF !important;
-        padding: 5px 12px;
-        border-radius: 5px;
-        font-weight: 700;
-        font-size: 0.76rem;
-    }
-    .tricolor-accent {
-        width: 24px;
-        height: 16px;
-        background: linear-gradient(180deg, #FF9933 33%, #FFFFFF 33%, #FFFFFF 66%, #138808 66%);
-        border: 1px solid #CBD5E1;
-        border-radius: 2px;
-    }
-
-    /* Search Panel Box */
-    .search-banner {
+        justify-content: center;
         background: #FFFFFF;
-        border: 1px solid #CBD5E1;
-        border-radius: 10px;
-        padding: 14px 18px;
-        margin-top: 12px;
-        margin-bottom: 12px;
-        box-shadow: 0 3px 10px rgba(15, 23, 42, 0.05);
+        border: 2px solid #E2C891;
+        border-radius: 50%;
+        width: 78px;
+        height: 78px;
+        box-shadow: 0 4px 12px rgba(217, 119, 6, 0.16);
+        margin-bottom: 8px;
+    }
+    .center-brand-title {
+        font-size: 2.15rem;
+        font-weight: 900;
+        color: #0A2240 !important;
+        letter-spacing: -0.4px;
+        line-height: 1.15;
+        margin: 0;
+    }
+    .center-brand-title span {
+        color: #D97706 !important;
+    }
+    .center-brand-sub {
+        font-size: 0.92rem;
+        font-weight: 700;
+        color: #334155 !important;
+        margin-top: 5px;
+        letter-spacing: 0.3px;
+    }
+    .center-ministry-pill {
+        display: inline-block;
+        margin-top: 8px;
+        background: #FEF3C7;
+        border: 1px solid #F59E0B;
+        color: #92400E !important;
+        font-size: 0.74rem;
+        font-weight: 800;
+        padding: 4px 14px;
+        border-radius: 20px;
+        letter-spacing: 0.6px;
+        text-transform: uppercase;
     }
 
     /* Hero Banner + Quote Card */
@@ -144,6 +137,7 @@ st.markdown("""
         background: linear-gradient(120deg, #1E1B4B 0%, #312E81 55%, #1E3A8A 100%);
         margin-left: -1.4rem;
         margin-right: -1.4rem;
+        margin-top: 12px;
         padding: 24px 28px 50px 28px;
     }
     .quote-card-wrap {
@@ -236,7 +230,7 @@ st.markdown("""
         100% { transform: translateX(-100%); }
     }
 
-    /* Gateway Cards */
+    /* Gateway & Form Cards */
     .services-banner {
         background: linear-gradient(135deg, #DC2626 0%, #B91C1C 100%);
         padding: 18px 22px;
@@ -260,7 +254,6 @@ st.markdown("""
     .portal-heading { font-size: 1.25rem; font-weight: 800; color: #0F172A !important; margin-bottom: 8px; }
     .portal-body { font-size: 0.88rem; color: #334155 !important; line-height: 1.5; }
 
-    /* Animated Officer Auth Card */
     @keyframes fadeSlideUp {
         from { opacity: 0; transform: translateY(14px); }
         to { opacity: 1; transform: translateY(0); }
@@ -276,7 +269,6 @@ st.markdown("""
     .auth-hero-card h3 { color: #FFFFFF !important; margin: 0 0 4px 0; font-size: 1.25rem; font-weight: 800; }
     .auth-hero-card p { color: #CBD5E1 !important; margin: 0; font-size: 0.84rem; }
 
-    /* Clean Simple Citizen Form Card */
     .citizen-card {
         background: #FFFFFF;
         border: 1px solid #CBD5E1;
@@ -307,87 +299,93 @@ st.markdown("""
 
     @media (max-width: 768px) {
         .block-container { padding-left: 0.7rem !important; padding-right: 0.7rem !important; }
-        .india-nav { margin-left: -0.7rem; margin-right: -0.7rem; padding: 10px 12px; }
+        .india-center-header { margin-left: -0.7rem; margin-right: -0.7rem; padding: 16px 12px; }
+        .tricolor-top-line { margin: -16px -12px 12px -12px; }
         .hero-banner { margin-left: -0.7rem; margin-right: -0.7rem; padding: 18px 14px 44px 14px; }
+        .center-brand-title { font-size: 1.65rem; }
         .quote-card-wrap { padding: 14px; }
-        .india-logo-text { font-size: 1.25rem; }
     }
 </style>
 """, unsafe_allow_html=True)
 
-# -------------------- TOP INDIA.GOV.IN NAVBAR --------------------
+# -------------------- LARGE CENTERED PREMIUM GOVERNMENT HEADER --------------------
 st.markdown(f"""
-<div class="india-nav">
-    <div class="india-brand">
-        <svg width="34" height="40" viewBox="0 0 64 76" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <circle cx="32" cy="24" r="14" stroke="#1E3A8A" stroke-width="3.5"/>
-            <circle cx="32" cy="24" r="3" fill="#1E3A8A"/>
-            <line x1="32" y1="10" x2="32" y2="38" stroke="#1E3A8A" stroke-width="2"/>
-            <line x1="18" y1="24" x2="46" y2="24" stroke="#1E3A8A" stroke-width="2"/>
-            <line x1="22" y1="14" x2="42" y2="34" stroke="#1E3A8A" stroke-width="1.8"/>
-            <line x1="42" y1="14" x2="22" y2="34" stroke="#1E3A8A" stroke-width="1.8"/>
-            <rect x="14" y="45" width="36" height="6" rx="2" fill="#1E3A8A"/>
+<div class="india-center-header">
+    <div class="tricolor-top-line"></div>
+    <div class="center-emblem-wrap">
+        <svg width="38" height="44" viewBox="0 0 64 76" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <circle cx="32" cy="24" r="14" stroke="#0A2240" stroke-width="3.5"/>
+            <circle cx="32" cy="24" r="3" fill="#0A2240"/>
+            <line x1="32" y1="10" x2="32" y2="38" stroke="#0A2240" stroke-width="2"/>
+            <line x1="18" y1="24" x2="46" y2="24" stroke="#0A2240" stroke-width="2"/>
+            <line x1="22" y1="14" x2="42" y2="34" stroke="#0A2240" stroke-width="1.8"/>
+            <line x1="42" y1="14" x2="22" y2="34" stroke="#0A2240" stroke-width="1.8"/>
+            <rect x="14" y="45" width="36" height="6" rx="2" fill="#0A2240"/>
             <rect x="10" y="54" width="44" height="7" rx="2" fill="#FF9933"/>
         </svg>
-        <div>
-            <div class="india-logo-text">sarkarisewa<span>.gov.in</span></div>
-            <div class="india-logo-sub">National Civic Grievance Portal • {city_cfg['city_name']}</div>
-        </div>
+        <span style="font-size:0.54rem; font-weight:800; color:#0A2240 !important; margin-top:2px;">सत्यमेव जयते</span>
     </div>
-    <div class="india-nav-right">
-        <span class="nav-red-btn">NIC VERIFIED</span>
-        <span>अ / A</span>
-        <div class="tricolor-accent"></div>
-    </div>
+    <h1 class="center-brand-title">sarkarisewa<span>.gov.in</span></h1>
+    <div class="center-brand-sub">National Civic Grievance & Public Accountability Portal • {city_cfg['city_name']}</div>
+    <div class="center-ministry-pill">{city_cfg['ministry_header']}</div>
 </div>
 """, unsafe_allow_html=True)
 
-# -------------------- WORKING INTERACTIVE SEARCH BAR (TICKET ID OR WARD) --------------------
+# -------------------- CLEAN SEARCH BAR (TRIGGERS ONLY ON CLICKING SEARCH) --------------------
 all_rows = fetch_all_complaints()
 
-with st.container():
-    st.markdown('<div class="search-banner">', unsafe_allow_html=True)
-    s_col1, s_col2, s_col3 = st.columns([3.2, 1.4, 1])
+with st.container(border=True):
+    s_col1, s_col2, s_col3 = st.columns([3.2, 1.5, 1])
     q_input = s_col1.text_input(
         "Search Portal",
-        value=st.session_state["search_query"],
-        placeholder="Search by Ticket ID (e.g., SS-2026-101) or Ward No / Name (e.g., Ward 28, Boring Road)...",
+        placeholder="Enter Ticket ID (e.g., SS-2026-101) or Ward Name / Number...",
         label_visibility="collapsed"
     )
     ward_filter_options = ["All Wards"] + [w["name"] for w in city_cfg["wards"]]
-    quick_ward = s_col2.selectbox("Quick Ward Filter", ward_filter_options, label_visibility="collapsed")
+    quick_ward = s_col2.selectbox("Select Ward", ward_filter_options, label_visibility="collapsed")
     search_clicked = s_col3.button("Search", type="primary", use_container_width=True)
-    st.markdown('</div>', unsafe_allow_html=True)
 
-    # Trigger search if button clicked, text typed, or specific ward chosen from dropdown
-    active_search = q_input.strip() if (search_clicked or q_input.strip()) else (quick_ward if quick_ward != "All Wards" else "")
-    if active_search:
-        st.session_state["search_query"] = q_input.strip()
-        matches = [
-            r for r in all_rows
-            if active_search.lower() in r[1].lower() or active_search.lower() in r[4].lower() or active_search.lower() in r[7].lower()
-        ]
-        with st.container(border=True):
-            sh1, sh2 = st.columns([4, 1])
-            sh1.markdown(f"**Search Results for `{active_search}` — Total Complaints Found: `{len(matches)}`**")
-            if sh2.button("Clear Search", use_container_width=True):
-                st.session_state["search_query"] = ""
-                st.rerun()
+    # Only update search results when user explicitly clicks the Search button
+    if search_clicked:
+        if q_input.strip():
+            st.session_state["submitted_search"] = q_input.strip()
+        elif quick_ward != "All Wards":
+            st.session_state["submitted_search"] = quick_ward
+        else:
+            st.session_state["submitted_search"] = "ALL"
 
-            if not matches:
-                st.info("No complaints matched your search. Try searching `SS-2026-101`, `Ward 28`, `Ward 22`, or `Ward 41`.")
-            else:
-                m_active = sum(1 for m in matches if m[18] != "Resolved")
-                m_resolved = sum(1 for m in matches if m[18] == "Resolved")
-                sm1, sm2, sm3 = st.columns(3)
-                sm1.metric("Total Complaints", len(matches))
-                sm2.metric("Active / Pending", m_active)
-                sm3.metric("Resolved", m_resolved)
+    if st.session_state["submitted_search"]:
+        term = st.session_state["submitted_search"]
+        if term == "ALL":
+            matches = all_rows
+            display_label = "All Wards"
+        else:
+            matches = [
+                r for r in all_rows
+                if term.lower() in r[1].lower() or term.lower() in r[4].lower() or term.lower() in r[7].lower()
+            ]
+            display_label = term
 
-                for m in matches:
-                    st.markdown(
-                        f"• **`{m[1]}`** | **{m[7]}** — *{m[4]}* | Status: **`{m[18]}`** | Severity: `{m[8]}/10` | Citizens Affected: `{m[17]}`"
-                    )
+        sh1, sh2 = st.columns([4, 1])
+        sh1.markdown(f"**Search Results for `{display_label}` — Total Complaints Found: `{len(matches)}`**")
+        if sh2.button("Clear Search", use_container_width=True):
+            st.session_state["submitted_search"] = ""
+            st.rerun()
+
+        if not matches:
+            st.info("No complaints matched your search. Try searching `SS-2026-101`, `Ward 28`, or select a Ward and click Search.")
+        else:
+            m_active = sum(1 for m in matches if m[18] != "Resolved")
+            m_resolved = sum(1 for m in matches if m[18] == "Resolved")
+            sm1, sm2, sm3 = st.columns(3)
+            sm1.metric("Total Complaints", len(matches))
+            sm2.metric("Active / Pending", m_active)
+            sm3.metric("Resolved", m_resolved)
+
+            for m in matches:
+                st.markdown(
+                    f"• **`{m[1]}`** | **{m[7]}** — *{m[4]}* | Status: **`{m[18]}`** | Severity: `{m[8]}/10` | Citizens Affected: `{m[17]}`"
+                )
 
 # Live Stats Calculation
 total_tickets = len(all_rows)
@@ -514,7 +512,6 @@ elif st.session_state["active_view"] == "citizen":
 
     c_left, c_right = st.columns([1.15, 1], gap="large")
 
-    # Left: Simple, Clean, Mobile-Friendly Citizen Complaint Card
     with c_left:
         st.markdown('<div class="citizen-card">', unsafe_allow_html=True)
         st.markdown('<div class="section-heading">Register a Civic Complaint (3 Simple Steps)</div>', unsafe_allow_html=True)
@@ -588,7 +585,6 @@ elif st.session_state["active_view"] == "citizen":
 
         st.markdown('</div>', unsafe_allow_html=True)
 
-    # Right: Clean Ticket Tracking & Re-Open Veto
     with c_right:
         st.markdown('<div class="citizen-card">', unsafe_allow_html=True)
         st.markdown('<div class="section-heading">Track Your Complaint Status</div>', unsafe_allow_html=True)
@@ -642,7 +638,7 @@ elif st.session_state["active_view"] == "gov":
         st.markdown("""
         <div class="auth-hero-card">
             <h3>Municipal Command Center — Secured Officer Gateway</h3>
-            <p>Authorized personnel sign-in and departmental onboarding portal (NIC Encryption Standard)</p>
+            <p>Authorized personnel sign-in and departmental onboarding portal</p>
         </div>
         """, unsafe_allow_html=True)
 
